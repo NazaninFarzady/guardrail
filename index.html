@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en" id="htmlRoot" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guardrail — Unified Startup & Incubator Risk-Mitigation Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased min-h-screen flex transition-colors duration-200">
+
+    <!-- Sidebar Navigation -->
+    <aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col justify-between sticky top-0 h-screen p-4 shadow-sm z-30">
+        <div>
+            <!-- Platform Brand & Role Switcher Header -->
+            <div class="flex items-center space-x-3 px-2 py-3 mb-4">
+                <div id="brandIcon" class="bg-indigo-600 text-white p-2 rounded-lg font-bold flex items-center justify-center shadow-lg shadow-indigo-600/20">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm text-slate-900 dark:text-white tracking-wide">GUARDRAIL</h1>
+                    <p id="brandSubtitle" class="text-[10px] text-slate-500 dark:text-slate-400">Unified Platform</p>
+                </div>
+            </div>
+
+            <!-- Role Selector Switcher -->
+            <div class="bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 mb-5 text-xs">
+                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-2 py-1">Select Active Role</p>
+                <div class="grid grid-cols-2 gap-1 mt-0.5">
+                    <button onclick="switchRole('founder')" id="roleBtn-founder" class="py-2 rounded-lg font-semibold transition flex items-center justify-center space-x-1 bg-indigo-600 text-white shadow-xs">
+                        <i data-lucide="user" class="w-3.5 h-3.5"></i>
+                        <span>Founder</span>
+                    </button>
+                    <button onclick="switchRole('director')" id="roleBtn-director" class="py-2 rounded-lg font-semibold transition flex items-center justify-center space-x-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                        <i data-lucide="shield" class="w-3.5 h-3.5"></i>
+                        <span>Director</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dynamic Sidebar Navigation Links -->
+            <nav id="sidebarNavLinks" class="space-y-1.5">
+                <!-- Rendered dynamically via JS -->
+            </nav>
+        </div>
+
+        <!-- Role Profile Card -->
+        <div class="bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs">
+            <div class="flex items-center justify-between mb-1.5">
+                <span id="profileRoleBadge" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Founder Mode</span>
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            </div>
+            <p id="profileTitle" class="font-semibold text-slate-900 dark:text-white">Spotted (App) • Batch 2026</p>
+            <p id="profileSubtitle" class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Connected to Incubator Mentors</p>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col min-h-screen">
+
+        <!-- Top Header -->
+        <header class="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/50 backdrop-blur sticky top-0 z-40 px-6 py-4 flex items-center justify-between shadow-xs">
+            <div>
+                <h2 id="pageTitle" class="text-base font-bold text-slate-900 dark:text-white">Startup Dashboard</h2>
+                <p id="pageSubtitle" class="text-xs text-slate-500 dark:text-slate-400">Track your validation milestones and polite-trap resistance.</p>
+            </div>
+            <div class="flex items-center space-x-3">
+                <!-- Theme Toggle Button -->
+                <button onclick="toggleTheme()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition" title="Toggle Light/Dark Mode">
+                    <i id="themeIcon" data-lucide="sun" class="w-4 h-4"></i>
+                </button>
+
+                <!-- Conditional Header Action Buttons -->
+                <div id="headerActionButtons" class="flex items-center space-x-3">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <div id="userAvatar" class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 border border-indigo-300 dark:border-indigo-700 flex items-center justify-center font-bold text-xs text-indigo-700 dark:text-indigo-300">
+                    SP
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic Content Container -->
+        <main id="mainContentContainer" class="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6">
+            <!-- Content injected dynamically based on activeRole and activeTab -->
+        </main>
+    </div>
+
+    <!-- MODAL: ADD NEW AUDIT (FOUNDER) -->
+    <div id="auditModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl max-w-lg w-full p-6 shadow-2xl space-y-4 relative">
+            <div class="flex items-center justify-between">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center space-x-2">
+                    <i data-lucide="cpu" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i>
+                    <span>Run Adversarial Guardrail Audit</span>
+                </h3>
+                <button onclick="closeNewAuditModal()" class="text-slate-400 hover:text-slate-700 dark:hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+                Paste your raw customer interview transcript or notes below. Guardrail's anti-gaming engine will analyze talk-time depth, behavioral grounding, and psychological pushback.
+            </p>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">Interview Subject / Participant Title</label>
+                    <input type="text" id="inputSubject" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg p-2.5 text-xs text-slate-900 dark:text-slate-200 focus:outline-none focus:border-indigo-500" placeholder="e.g., Cafe Owner in Grunerløkka">
+                </div>
+
+                <!-- Input Type Selector Tabs -->
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">Input Method</label>
+                    <div class="grid grid-cols-3 gap-2 bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-200 dark:border-slate-800 text-xs">
+                        <button onclick="setInputMode('text')" id="mode-text" class="py-1.5 rounded bg-indigo-600 text-white font-semibold transition flex items-center justify-center space-x-1.5">
+                            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                            <span>Text / Notes</span>
+                        </button>
+                        <button onclick="setInputMode('file')" id="mode-file" class="py-1.5 rounded text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-semibold transition flex items-center justify-center space-x-1.5">
+                            <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                            <span>Upload File</span>
+                        </button>
+                        <button onclick="setInputMode('audio')" id="mode-audio" class="py-1.5 rounded text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-semibold transition flex items-center justify-center space-x-1.5">
+                            <i data-lucide="mic" class="w-3.5 h-3.5"></i>
+                            <span>Record Audio</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mode 1: Text Input -->
+                <div id="container-text" class="space-y-1">
+                    <label class="block text-[10px] text-slate-500 dark:text-slate-400">Paste raw interview transcript or notes</label>
+                    <textarea id="inputTranscript" rows="4" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg p-2.5 text-xs text-slate-900 dark:text-slate-200 focus:outline-none focus:border-indigo-500 font-mono" placeholder="Founder: Did you like our app?&#10;Customer: Yes, absolutely wonderful idea!..."></textarea>
+                </div>
+
+                <!-- Mode 2: File Upload -->
+                <div id="container-file" class="space-y-1 hidden">
+                    <label class="block text-[10px] text-slate-500 dark:text-slate-400">Upload transcript document (.docx, .pdf, .txt)</label>
+                    <div class="border-2 border-dashed border-slate-300 dark:border-slate-800 rounded-lg p-6 text-center bg-slate-50 dark:bg-slate-950 hover:border-indigo-500 transition cursor-pointer">
+                        <i data-lucide="file-up" class="w-8 h-8 text-indigo-600 dark:text-indigo-400 mx-auto mb-2"></i>
+                        <p class="text-xs text-slate-700 dark:text-slate-300 font-medium">Click to browse or drag and drop files here</p>
+                        <p class="text-[10px] text-slate-500 mt-1">Supports DOCX, PDF, TXT (Max 25MB)</p>
+                        <input type="file" id="inputFile" class="hidden" onchange="handleFileSelect(event)">
+                    </div>
+                    <p id="fileNameDisplay" class="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono mt-1 hidden"></p>
+                </div>
+
+                <!-- Mode 3: Audio / Record -->
+                <div id="container-audio" class="space-y-2 hidden">
+                    <label class="block text-[10px] text-slate-500 dark:text-slate-400">Record interview or upload audio (.mp3, .m4a, .wav)</label>
+                    <div class="bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg p-4 text-center space-y-3">
+                        <div id="micStatus" class="flex items-center justify-center space-x-2 text-xs text-slate-500 dark:text-slate-400">
+                            <span class="w-2.5 h-2.5 rounded-full bg-slate-400 dark:bg-slate-600"></span>
+                            <span>Ready to record or upload</span>
+                        </div>
+                        <div class="flex justify-center space-x-3">
+                            <button onclick="toggleRecording()" id="recordBtn" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition flex items-center space-x-2">
+                                <i data-lucide="mic" class="w-4 h-4"></i>
+                                <span id="recordBtnText">Start Recording</span>
+                            </button>
+                            <label class="bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold px-4 py-2 rounded-lg transition cursor-pointer flex items-center space-x-2">
+                                <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                                <span>Upload Audio</span>
+                                <input type="file" accept="audio/*" class="hidden" onchange="handleAudioUpload(event)">
+                            </label>
+                        </div>
+                        <p id="audioFileNameDisplay" class="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono hidden"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-2">
+                <button onclick="closeNewAuditModal()" class="bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold px-4 py-2 rounded-lg transition">Cancel</button>
+                <button onclick="submitNewAudit()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-md shadow-indigo-600/20">Run Audit & Sync</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: LP COMPLIANCE & RISK CERTIFICATE (DIRECTOR) -->
+    <div id="lpCertificateModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl max-w-xl w-full p-6 shadow-2xl space-y-5 relative">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-emerald-600 text-white p-2 rounded-lg">
+                        <i data-lucide="award" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">LP Compliance & Risk Certificate</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Cryptographically verifiable batch validation report for Limited Partners</p>
+                    </div>
+                </div>
+                <button onclick="closeLPCertificateModal()" class="text-slate-400 hover:text-slate-700 dark:hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-3 text-xs">
+                <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
+                    <span class="text-slate-500">Batch Program:</span>
+                    <span class="font-bold text-slate-900 dark:text-white">Fall 2026 Cohort (12 Startups)</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
+                    <span class="text-slate-500">Total Capital Protected:</span>
+                    <span class="font-bold text-emerald-600 dark:text-emerald-400 font-mono">12,500,000 NOK (Deferred Unvalidated Tranches)</span>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 pt-2">
+                <button onclick="closeLPCertificateModal()" class="bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-700 dark:text-slate-300 text-xs font-semibold px-4 py-2 rounded-lg transition">Close</button>
+                <button onclick="alert('Downloading cryptographically signed LP Risk Certificate PDF...'); closeLPCertificateModal();" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-md flex items-center space-x-2">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span>Download Signed PDF</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: FULL STRUCTURED AUDIT REPORT (FULL ANALYZE) -->
+    <div id="fullAnalyzeModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl max-w-2xl w-full p-6 shadow-2xl space-y-5 relative max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-indigo-600 text-white p-2 rounded-lg">
+                        <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Guardrail Adversarial Audit Report</h3>
+                        <p id="reportSubjectTitle" class="text-xs text-slate-500 dark:text-slate-400">Participant: Restaurant Owner (Majorstuen)</p>
+                    </div>
+                </div>
+                <button onclick="closeFullAnalyzeModal()" class="text-slate-400 hover:text-slate-700 dark:hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Status & Scores -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
+                <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-3">
+                    <p class="text-[10px] text-slate-500 uppercase font-semibold">Audit Verdict</p>
+                    <p id="reportVerdictBadge" class="text-xs font-bold px-2 py-1 rounded inline-block mt-1">FAIL (NICE COMPLIMENT TRAP)</p>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-3">
+                    <p class="text-[10px] text-slate-500 uppercase font-semibold">Polite-Trap Resistance</p>
+                    <p id="reportPoliteScore" class="text-lg font-bold text-slate-900 dark:text-white mt-1 font-mono">0 / 100</p>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-3">
+                    <p class="text-[10px] text-slate-500 uppercase font-semibold">Mom-Test Score</p>
+                    <p id="reportMomScore" class="text-lg font-bold text-slate-900 dark:text-white mt-1 font-mono">25 / 100</p>
+                </div>
+            </div>
+
+            <!-- AI Remediation Copilot Action Banner (Founder View Feature) -->
+            <div id="copilotBanner" class="bg-gradient-to-r from-indigo-900/40 via-purple-900/30 to-indigo-900/40 border border-indigo-500/30 rounded-xl p-4 flex items-center justify-between">
+                <div class="space-y-1">
+                    <h4 class="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center space-x-1.5">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-indigo-400"></i>
+                        <span>AI Remediation Copilot Available</span>
+                    </h4>
+                    <p class="text-[11px] text-slate-300">Let Guardrail rewrite your discovery script into Mom-Test compliant behavioral prompts.</p>
+                </div>
+                <button onclick="toggleCopilotBox()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition shadow-md shrink-0 flex items-center space-x-1.5">
+                    <i data-lucide="wand-2" class="w-4 h-4"></i>
+                    <span>Fix My Script</span>
+                </button>
+            </div>
+
+            <!-- COLLAPSIBLE AI COPILOT REWRITE BOX -->
+            <div id="copilotBox" class="bg-slate-50 dark:bg-slate-950 border border-indigo-500/40 rounded-xl p-4 space-y-3 hidden">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+                    <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">// Mom-Test Compliant Script Rewrite</span>
+                    <span class="text-[10px] text-slate-500">Domain: Local Hospitality SaaS</span>
+                </div>
+                <div class="space-y-2.5 text-xs text-slate-700 dark:text-slate-300">
+                    <div class="bg-rose-500/10 p-2.5 rounded border border-rose-500/20">
+                        <p class="text-[10px] font-bold text-rose-600 dark:text-rose-400 uppercase">❌ What You Asked (Flawed):</p>
+                        <p class="font-mono text-slate-600 dark:text-slate-400 mt-0.5">"Would you use an app that helps you find local customers for $50/mo?"</p>
+                    </div>
+                    <div class="bg-emerald-500/10 p-2.5 rounded border border-emerald-500/20">
+                        <p class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">✅ Guardrail Copilot Rewrite (Behavioral):</p>
+                        <p class="font-mono text-emerald-700 dark:text-emerald-300 mt-0.5">"Walk me through the last time you tried to acquire new local patrons. How much did you spend, and what tool or method did you use?"</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Red-Flag Breakdown -->
+            <div class="space-y-2">
+                <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center space-x-1.5">
+                    <i data-lucide="file-search" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i>
+                    <span>1. Transcript Red-Flag Breakdown</span>
+                </h4>
+                <div id="reportTranscriptBox" class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-3.5 font-mono text-xs text-slate-700 dark:text-slate-300 space-y-1"></div>
+            </div>
+
+            <!-- Adversarial Critique -->
+            <div class="space-y-2">
+                <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center space-x-1.5">
+                    <i data-lucide="alert-octagon" class="w-4 h-4 text-rose-500"></i>
+                    <span>2. Adversarial Critique</span>
+                </h4>
+                <div class="bg-rose-500/10 border border-rose-500/20 rounded-lg p-3.5 text-xs text-slate-700 dark:text-slate-300 space-y-2">
+                    <div><strong class="text-rose-600 dark:text-rose-400">The "Nice Compliment" Trap:</strong> The customer gave a classic social-contract compliment ("wonderful idea").</div>
+                    <div><strong class="text-rose-600 dark:text-rose-400">Leading Question Violation:</strong> Asking "Did you like our app concept?" primes agreement.</div>
+                    <div><strong class="text-rose-600 dark:text-rose-400">Missing Behavioral Evidence:</strong> The founder failed to probe past financial or time investments.</div>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-3 border-t border-slate-200 dark:border-slate-800">
+                <button onclick="closeFullAnalyzeModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-md">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unified JavaScript Application Core -->
+    <script>
+        lucide.createIcons();
+
+        // Global State
+        let activeRole = 'founder'; // 'founder' or 'director'
+        let activeTab = 'dashboard'; // founder tabs: 'dashboard', 'logs', 'mentor' | director tabs: 'portfolio', 'cohort', 'settings', 'startup-detail'
+        let activeStartupDetail = '';
+
+        let audits = [
+            {
+                id: 1,
+                startupName: "Spotted",
+                subject: "Restaurant Owner (Majorstuen)",
+                date: "Oct 24, 2026",
+                status: "FAIL",
+                statusLabel: "FAIL: Polite Trap Detected",
+                statusClass: "bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30",
+                politeScore: "0 / 100",
+                momScore: "25 / 100",
+                excerpt: "Founder asked 'Did you like our app?' Owner replied 'Yes, great idea!'"
+            },
+            {
+                id: 2,
+                startupName: "Spotted",
+                subject: "Cafe Manager (Grønland)",
+                date: "Oct 22, 2026",
+                status: "WARNING",
+                statusLabel: "WARNING: Weak Behavioral Proof",
+                statusClass: "bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30",
+                politeScore: "40 / 100",
+                momScore: "50 / 100",
+                excerpt: "Customer expressed interest but refused to put down a pre-order deposit."
+            },
+            {
+                id: 3,
+                startupName: "Woolpack",
+                subject: "Packaging Distributor (Oslo)",
+                date: "Oct 23, 2026",
+                status: "WARNING",
+                statusLabel: "WARNING: Unit Economics Risk",
+                statusClass: "bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30",
+                politeScore: "50 / 100",
+                momScore: "60 / 100",
+                excerpt: "Distributor liked concept but noted high washing costs."
+            },
+            {
+                id: 4,
+                startupName: "Outrun",
+                subject: "Elite Endurance Coach",
+                date: "Oct 25, 2026",
+                status: "PASS",
+                statusLabel: "PASS: Verified Traction",
+                statusClass: "bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30",
+                politeScore: "90 / 100",
+                momScore: "85 / 100",
+                excerpt: "Tested biosensor precision against lab blood samples and paid 5000 NOK upfront."
+            }
+        ];
+
+        function toggleTheme() {
+            const root = document.getElementById('htmlRoot');
+            const icon = document.getElementById('themeIcon');
+            if(root.classList.contains('dark')) {
+                root.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                icon.setAttribute('data-lucide', 'moon');
+            } else {
+                root.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                icon.setAttribute('data-lucide', 'sun');
+            }
+            lucide.createIcons();
+        }
+
+        if(localStorage.getItem('theme') === 'light') {
+            document.getElementById('htmlRoot').classList.remove('dark');
+            document.getElementById('themeIcon').setAttribute('data-lucide', 'moon');
+            lucide.createIcons();
+        }
+
+        // Switch Role (Founder vs Director)
+        function switchRole(role) {
+            activeRole = role;
+            const founderBtn = document.getElementById('roleBtn-founder');
+            const directorBtn = document.getElementById('roleBtn-director');
+            const brandIcon = document.getElementById('brandIcon');
+            const brandSubtitle = document.getElementById('brandSubtitle');
+            const profileRoleBadge = document.getElementById('profileRoleBadge');
+            const profileTitle = document.getElementById('profileTitle');
+            const profileSubtitle = document.getElementById('profileSubtitle');
+            const userAvatar = document.getElementById('userAvatar');
+
+            if(role === 'founder') {
+                founderBtn.className = "py-2 rounded-lg font-semibold transition flex items-center justify-center space-x-1 bg-indigo-600 text-white shadow-xs";
+                directorBtn.className = "py-2 rounded-lg font-semibold transition flex items-center justify-center space-x-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white";
+                brandIcon.className = "bg-rose-500 text-white p-2 rounded-lg font-bold flex items-center justify-center shadow-lg shadow-rose-500/20";
+                brandSubtitle.innerText = "Founder Validation Hub";
+                profileRoleBadge.innerText = "Founder Mode";
+                profileTitle.innerText = "Spotted (App) • Batch 2026";
+                profileSubtitle.innerText = "Connected to Incubator Mentors";
+                userAvatar.innerText = "SP";
+                activeTab = 'dashboard';
+            } else {
+                directorBtn.className = "py-2 rounded-lg font-semibold transition flex items-center justify-center space-x-1 bg-indigo-600 text-white shadow-xs";
+                founderBtn.className = "py-2 rounded-lg font-semibold transition flex items-center justify-center space-x-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white";
+                brandIcon.className = "bg-indigo-600 text-white p-2 rounded-lg font-bold flex items-center justify-center shadow-lg shadow-indigo-600/20";
+                brandSubtitle.innerText = "Incubator Command Center";
+                profileRoleBadge.innerText = "Director Access";
+                profileTitle.innerText = "Fall 2026 Batch Program";
+                profileSubtitle.innerText = "Managing 12 Portfolio Startups";
+                userAvatar.innerText = "KJ";
+                activeTab = 'portfolio';
+            }
+
+            renderSidebarNav();
+            renderHeaderActions();
+            renderMainContent();
+            lucide.createIcons();
+        }
+
+        // Switch Tab within Role
+        function switchTab(tab) {
+            activeTab = tab;
+            renderSidebarNav();
+            renderHeaderActions();
+            renderMainContent();
+            lucide.createIcons();
+        }
+
+        // Render Sidebar Navigation Links based on role & activeTab
+        function renderSidebarNav() {
+            const nav = document.getElementById('sidebarNavLinks');
+            if(activeRole === 'founder') {
+                nav.innerHTML = `
+                    <button onclick="switchTab('dashboard')" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-semibold ${activeTab === 'dashboard' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'} transition">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                        <span>Dashboard</span>
+                    </button>
+                    <button onclick="switchTab('logs')" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-semibold ${activeTab === 'logs' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'} transition">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                        <span>Interviews & Audits Log</span>
+                    </button>
+                    <button onclick="switchTab('mentor')" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-semibold ${activeTab === 'mentor' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'} transition">
+                        <i data-lucide="users" class="w-4 h-4"></i>
+                        <span>Mentor Hub & Sync</span>
+                    </button>
+                `;
+            } else {
+                nav.innerHTML = `
+                    <button onclick="switchTab('portfolio')" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-semibold ${activeTab === 'portfolio' || activeTab === 'startup-detail' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'} transition">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                        <span>Portfolio Startups</span>
+                    </button>
+                    <button onclick="switchTab('cohort')" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-semibold ${activeTab === 'cohort' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'} transition">
+                        <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                        <span>Cohort Analytics</span>
+                    </button>
+                    <button onclick="switchTab('settings')" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-semibold ${activeTab === 'settings' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'} transition">
+                        <i data-lucide="settings" class="w-4 h-4"></i>
+                        <span>Milestone Rules</span>
+                    </button>
+                `;
+            }
+        }
+
+        // Render Header Action Buttons based on role
+        function renderHeaderActions() {
+            const container = document.getElementById('headerActionButtons');
+            const title = document.getElementById('pageTitle');
+            const subtitle = document.getElementById('pageSubtitle');
+
+            if(activeRole === 'founder') {
+                title.innerText = activeTab === 'dashboard' ? 'Startup Dashboard' : (activeTab === 'logs' ? 'Interviews & Audits Log' : 'Mentor Hub & Sync');
+                subtitle.innerText = activeTab === 'dashboard' ? 'Track your validation milestones and polite-trap resistance.' : (activeTab === 'logs' ? 'All historical transcripts and adversarial audit evaluations.' : 'Encrypted sharing of compliance scores with mentors.');
+                
+                container.innerHTML = `
+                    <button onclick="openNewAuditModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition shadow-md shadow-indigo-600/20 flex items-center space-x-2">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>Add New Audit</span>
+                    </button>
+                `;
+            } else {
+                title.innerText = activeTab === 'portfolio' ? 'Portfolio Validation Dashboard' : (activeTab === 'cohort' ? 'Cohort-Wide Analytics & Charts' : (activeTab === 'startup-detail' ? `${activeStartupDetail} — Inspection & Logs` : 'Milestone Rules Configuration'));
+                subtitle.innerText = activeTab === 'portfolio' ? 'Monitor startup interview compliance and review structured audit logs.' : (activeTab === 'cohort' ? 'Visual risk-mitigation metrics and compliance distributions across batch startups.' : (activeTab === 'startup-detail' ? 'Reviewing specific audit transcripts and funding tranches.' : 'Define empirical proof requirements for batch progression.'));
+                
+                container.innerHTML = `
+                    <button onclick="openLPCertificateModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition shadow-md shadow-emerald-600/20 flex items-center space-x-2">
+                        <i data-lucide="award" class="w-4 h-4"></i>
+                        <span>LP Risk Certificate</span>
+                    </button>
+                    <button onclick="alert('Exporting cohort risk-mitigation report for investment committee...')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition shadow-md shadow-indigo-600/20 flex items-center space-x-2">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>Export Cohort Report</span>
+                    </button>
+                `;
+            }
+        }
+
+        // Render Main Content
+        function renderMainContent() {
+            const container = document.getElementById('mainContentContainer');
+
+            if(activeRole === 'founder') {
+                if(activeTab === 'dashboard') {
+                    container.innerHTML = `
+                        <!-- Milestone Card -->
+                        <div class="bg-gradient-to-r from-indigo-50 via-slate-50 to-indigo-50 dark:from-slate-900 dark:via-indigo-950/30 dark:to-slate-900 border border-indigo-200 dark:border-indigo-500/30 rounded-xl p-6 shadow-md relative overflow-hidden">
+                            <div class="absolute right-4 top-4 bg-indigo-500/10 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                                Active Milestone
+                            </div>
+                            <span class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Stage 2 of 4</span>
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-1">Milestone 2: Solution Demo Testing</h3>
+                            <p class="text-xs text-slate-600 dark:text-slate-300 mt-1 max-w-2xl leading-relaxed">
+                                To pass this milestone, you must conduct at least 5 customer discovery interviews without falling into the "nice compliment" trap, securing concrete behavioral evidence or pilot commitments.
+                            </p>
+                            <div class="mt-4 flex items-center space-x-4">
+                                <div class="flex-1 bg-slate-200 dark:bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-300 dark:border-slate-800">
+                                    <div class="bg-indigo-600 dark:bg-indigo-500 h-full w-[40%]"></div>
+                                </div>
+                                <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400">2 / 5 Validated Interviews</span>
+                            </div>
+                        </div>
+
+                        <!-- Recent Audits & Quick Stats Grid -->
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+                                        <i data-lucide="shield-check" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i>
+                                        <span>Recent Guardrail Audits</span>
+                                    </h3>
+                                    <button onclick="switchTab('logs')" class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-semibold">View All Logs →</button>
+                                </div>
+                                <div id="recentAuditsList" class="space-y-3"></div>
+                            </div>
+
+                            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
+                                <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+                                    <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500"></i>
+                                    <span>The "Nice Compliment" Warning</span>
+                                </h3>
+                                <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-3.5 text-xs space-y-2 text-slate-700 dark:text-slate-300">
+                                    <p class="font-semibold text-slate-900 dark:text-white">Rule #1 of The Mom Test:</p>
+                                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                                        Never ask if your idea is good. People will lie to be nice. Instead, ask about what they did last week to solve this problem.
+                                    </p>
+                                    <div class="pt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[10px] text-slate-500">
+                                        <span>Synced with Director Command Center</span>
+                                        <span class="text-emerald-500 font-semibold">Active</span>
+                                    </div>
+                                </div>
+                                <button onclick="openNewAuditModal()" class="w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-white text-xs font-semibold py-2.5 rounded-lg transition border border-slate-300 dark:border-slate-700 flex items-center justify-center space-x-2">
+                                    <i data-lucide="plus-circle" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i>
+                                    <span>Run New Audit Now</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    renderDashboardAudits();
+                } else if(activeTab === 'logs') {
+                    container.innerHTML = `
+                        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">All Uploaded Interviews & Audit Reports</h3>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Manage your transcripts, check compliance scores, and access AI Remediation Copilots.</p>
+                                </div>
+                                <button onclick="openNewAuditModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition flex items-center space-x-2">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    <span>Add New Audit</span>
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs">
+                                    <thead class="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+                                        <tr>
+                                            <th class="p-3">Interview Subject / Date</th>
+                                            <th class="p-3">Audit Status</th>
+                                            <th class="p-3">Polite-Trap Resistance</th>
+                                            <th class="p-3">Mom-Test Score</th>
+                                            <th class="p-3 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="fullAuditTableBody" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                    renderLogsTable();
+                } else if(activeTab === 'mentor') {
+                    container.innerHTML = `
+                        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
+                            <div>
+                                <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Connected Mentors & Incubator Sync</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Your raw transcripts remain private. Only structured Guardrail audit summaries and compliance scores are shared with Incubator Directors.</p>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                                <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex items-start space-x-3">
+                                    <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-600/20 border border-indigo-300 dark:border-indigo-500/30 flex items-center justify-center font-bold text-indigo-600 dark:text-indigo-400 text-sm shrink-0">KJ</div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between"><h4 class="font-bold text-slate-900 dark:text-white text-sm">Karl Johan (Incubator Director)</h4><span class="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded">Live Synced</span></div>
+                                        <p class="text-xs text-slate-500 dark:text-slate-400">Fall 2026 Batch Program Manager</p>
+                                        <p class="text-[11px] text-slate-700 dark:text-slate-300 mt-2 bg-white dark:bg-slate-900 p-2.5 rounded border border-slate-200 dark:border-slate-800">
+                                            "Portfolio risk score updated in real-time. Tranche status currently under review for Spotted."
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                // Director Mode
+                if(activeTab === 'portfolio') {
+                    container.innerHTML = `
+                        <!-- Cohort Overview Stats Banner -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+                                <p class="text-[10px] text-slate-500 uppercase font-semibold">Total Batch Startups</p>
+                                <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">12</p>
+                                <p class="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1">100% Active on Guardrail</p>
+                            </div>
+                            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+                                <p class="text-[10px] text-slate-500 uppercase font-semibold">Polite-Trap Failures</p>
+                                <p class="text-2xl font-bold text-rose-600 dark:text-rose-400 mt-1">4</p>
+                                <p class="text-[10px] text-rose-500 mt-1">Funding Tranches Deferred</p>
+                            </div>
+                            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+                                <p class="text-[10px] text-slate-500 uppercase font-semibold">Milestone 2 Pass Rate</p>
+                                <p class="text-2xl font-bold text-amber-500 mt-1">33%</p>
+                                <p class="text-[10px] text-slate-500 mt-1">Solution Demo Testing</p>
+                            </div>
+                            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+                                <p class="text-[10px] text-slate-500 uppercase font-semibold">Total Audits Scanned</p>
+                                <p class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">${audits.length + 44}</p>
+                                <p class="text-[10px] text-indigo-500 mt-1">Zero Raw Data Privacy Leaks</p>
+                            </div>
+                        </div>
+
+                        <!-- Startups Table Section -->
+                        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Portfolio Validation Status & Funding Control</h3>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Click on any startup row to view live synced interview logs, share with committee, or pause funding tranches.</p>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs">
+                                    <thead class="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+                                        <tr>
+                                            <th class="p-3">Startup Name & Founder</th>
+                                            <th class="p-3">Current Milestone Domain</th>
+                                            <th class="p-3 text-center whitespace-nowrap">Interviews Logged</th>
+                                            <th class="p-3 whitespace-nowrap">Guardrail Status</th>
+                                            <th class="p-3">Polite-Trap Resistance</th>
+                                            <th class="p-3 text-right whitespace-nowrap">Director Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                                        <tr onclick="openDirectorStartupDetail('Spotted')" class="hover:bg-slate-50 dark:hover:bg-slate-950/50 transition cursor-pointer">
+                                            <td class="p-3"><p class="font-semibold text-slate-900 dark:text-white">Spotted (App)</p><p class="text-[10px] text-slate-500">Single Founder • Pre-User Testing</p></td>
+                                            <td class="p-3"><span class="font-medium text-indigo-600 dark:text-indigo-400">Milestone 2: Solution Demo</span></td>
+                                            <td class="p-3 text-center font-mono font-bold text-slate-700 dark:text-slate-300"><span class="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded inline-block whitespace-nowrap">${audits.filter(a=>a.startupName==='Spotted').length} Interviews</span></td>
+                                            <td class="p-3 whitespace-nowrap"><span class="text-[10px] px-2.5 py-1 rounded-md font-bold bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 inline-block">FAIL (TRAP DETECTED)</span></td>
+                                            <td class="p-3 font-mono text-rose-600 font-bold">0 / 100</td>
+                                            <td class="p-3 text-right whitespace-nowrap" onclick="event.stopPropagation()">
+                                                <div class="inline-flex items-center justify-end space-x-2">
+                                                    <button onclick="pauseTranche('Spotted')" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-xs">Pause Tranche</button>
+                                                    <button onclick="openDirectorStartupDetail('Spotted')" class="bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-xs">Inspect</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr onclick="openDirectorStartupDetail('Woolpack')" class="hover:bg-slate-50 dark:hover:bg-slate-950/50 transition cursor-pointer">
+                                            <td class="p-3"><p class="font-semibold text-slate-900 dark:text-white">Woolpack (B2B Supply)</p><p class="text-[10px] text-slate-500">Technical R&D • Pilot Phase</p></td>
+                                            <td class="p-3"><span class="font-medium text-indigo-600 dark:text-indigo-400">Milestone 2: Solution Demo</span></td>
+                                            <td class="p-3 text-center font-mono font-bold text-slate-700 dark:text-slate-300"><span class="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded inline-block whitespace-nowrap">1 Interview</span></td>
+                                            <td class="p-3 whitespace-nowrap"><span class="text-[10px] px-2.5 py-1 rounded-md font-bold bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 inline-block">WARNING (UNIT ECON)</span></td>
+                                            <td class="p-3 font-mono text-amber-500 font-bold">50 / 100</td>
+                                            <td class="p-3 text-right whitespace-nowrap" onclick="event.stopPropagation()">
+                                                <div class="inline-flex items-center justify-end space-x-2">
+                                                    <button onclick="shareCommittee('Woolpack')" class="bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-xs">Share w/ Committee</button>
+                                                    <button onclick="openDirectorStartupDetail('Woolpack')" class="bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-xs">Inspect</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr onclick="openDirectorStartupDetail('Outrun')" class="hover:bg-slate-50 dark:hover:bg-slate-950/50 transition cursor-pointer">
+                                            <td class="p-3"><p class="font-semibold text-slate-900 dark:text-white">Outrun (Biosensor)</p><p class="text-[10px] text-slate-500">5-Member Team • Lab R&D</p></td>
+                                            <td class="p-3"><span class="font-medium text-indigo-600 dark:text-indigo-400">Milestone 3: Pilot Traction</span></td>
+                                            <td class="p-3 text-center font-mono font-bold text-slate-700 dark:text-slate-300"><span class="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded inline-block whitespace-nowrap">1 Interview</span></td>
+                                            <td class="p-3 whitespace-nowrap"><span class="text-[10px] px-2.5 py-1 rounded-md font-bold bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 inline-block">PASS (VERIFIED)</span></td>
+                                            <td class="p-3 font-mono text-emerald-600 font-bold">90 / 100</td>
+                                            <td class="p-3 text-right whitespace-nowrap" onclick="event.stopPropagation()">
+                                                <div class="inline-flex items-center justify-end space-x-2">
+                                                    <button onclick="shareCommittee('Outrun')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-xs">Approve Tranche</button>
+                                                    <button onclick="openDirectorStartupDetail('Outrun')" class="bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-xs">Inspect</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                } else if(activeTab === 'startup-detail') {
+                    const startupAudits = audits.filter(a => a.startupName === activeStartupDetail);
+                    container.innerHTML = `
+                        <div class="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+                            <div class="flex items-center space-x-3">
+                                <button onclick="switchTab('portfolio')" class="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition">
+                                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                                </button>
+                                <div>
+                                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">${activeStartupDetail} — Live Synced Audit Logs</h3>
+                                    <p class="text-xs text-slate-500">All interviews submitted by founder instantly flow here for director review.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="shareCommittee('${activeStartupDetail}')" class="bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 text-xs font-semibold px-3 py-2 rounded-lg transition flex items-center space-x-1.5">
+                                    <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+                                    <span>Share With Committee</span>
+                                </button>
+                                <button onclick="pauseTranche('${activeStartupDetail}')" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold px-3 py-2 rounded-lg transition shadow-md flex items-center space-x-1.5">
+                                    <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+                                    <span>Pause Tranche</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
+                            <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Submitted Transcripts & Audit Verdicts</h4>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs">
+                                    <thead class="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+                                        <tr>
+                                            <th class="p-3">Interview Subject / Date</th>
+                                            <th class="p-3">Audit Verdict</th>
+                                            <th class="p-3">Polite-Trap Resistance</th>
+                                            <th class="p-3">Mom-Test Score</th>
+                                            <th class="p-3 text-right">Structured Report</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                                        ${startupAudits.length === 0 ? '<tr><td colspan="5" class="p-4 text-center text-slate-500 italic">No interviews submitted by this startup yet.</td></tr>' : startupAudits.map(i => `
+                                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-950/50 transition">
+                                                <td class="p-3"><p class="font-semibold text-slate-900 dark:text-white">${i.subject}</p><p class="text-[10px] text-slate-500">${i.date}</p></td>
+                                                <td class="p-3"><span class="text-[10px] px-2 py-0.5 rounded font-bold ${i.status === 'FAIL' ? 'bg-rose-500/20 text-rose-600' : 'bg-emerald-500/20 text-emerald-600'}">${i.statusLabel}</span></td>
+                                                <td class="p-3 font-mono">${i.politeScore}</td>
+                                                <td class="p-3 font-mono">${i.momScore}</td>
+                                                <td class="p-3 text-right">
+                                                    <button onclick="openFullAnalyze(${i.id})" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded font-semibold transition">Full Analyze</button>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                } else if(activeTab === 'cohort') {
+                    container.innerHTML = `
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+                                        <i data-lucide="bar-chart-2" class="w-4 h-4 text-rose-500"></i>
+                                        <span>Polite-Trap Failure Rate by Stage</span>
+                                    </h3>
+                                    <span class="text-[10px] bg-rose-500/10 text-rose-600 px-2 py-0.5 rounded font-bold">High Risk</span>
+                                </div>
+                                <div class="space-y-3 pt-2 text-xs">
+                                    <div>
+                                        <div class="flex justify-between font-semibold mb-1"><span>Stage 1: Problem Discovery</span><span class="text-rose-600 font-mono">82% Fail Rate</span></div>
+                                        <div class="w-full bg-slate-100 dark:bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-800"><div class="bg-rose-500 h-full w-[82%] rounded-full"></div></div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between font-semibold mb-1"><span>Stage 2: Solution Demo Testing</span><span class="text-amber-500 font-mono">65% Fail Rate</span></div>
+                                        <div class="w-full bg-slate-100 dark:bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-800"><div class="bg-amber-500 h-full w-[65%] rounded-full"></div></div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between font-semibold mb-1"><span>Stage 3: Pilot Traction</span><span class="text-emerald-500 font-mono">24% Fail Rate</span></div>
+                                        <div class="w-full bg-slate-100 dark:bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-800"><div class="bg-emerald-500 h-full w-[24%] rounded-full"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+                                        <i data-lucide="pie-chart" class="w-4 h-4 text-indigo-600"></i>
+                                        <span>Most Frequent Red-Flag Violations</span>
+                                    </h3>
+                                    <span class="text-[10px] bg-indigo-500/10 text-indigo-600 px-2 py-0.5 rounded font-bold">Live Synced</span>
+                                </div>
+                                <div class="space-y-3 pt-2 text-xs">
+                                    <div>
+                                        <div class="flex justify-between font-semibold mb-1"><span>Leading Questions ("Did you like our app?")</span><span class="text-indigo-600 font-mono">44%</span></div>
+                                        <div class="w-full bg-slate-100 dark:bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-800"><div class="bg-indigo-600 h-full w-[44%] rounded-full"></div></div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between font-semibold mb-1"><span>Pitching Solution Before Minute 5</span><span class="text-indigo-600 font-mono">31%</span></div>
+                                        <div class="w-full bg-slate-100 dark:bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-800"><div class="bg-indigo-500 h-full w-[31%] rounded-full"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else if(activeTab === 'settings') {
+                    container.innerHTML = `
+                        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
+                            <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Validation Milestone Configuration</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Configure minimum adversarial proof required before milestone unlocking across the Fall 2026 batch.</p>
+                        </div>
+                    `;
+                }
+            }
+            lucide.createIcons();
+        }
+
+        // Helper rendering functions for audits
+        function renderDashboardAudits() {
+            const container = document.getElementById('recentAuditsList');
+            if(!container) return;
+            const founderAudits = audits.filter(a => a.startupName === 'Spotted');
+            if(founderAudits.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-500 italic">No audits logged yet.</p>';
+                return;
+            }
+            container.innerHTML = founderAudits.slice(0, 3).map(a => `
+                <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-3.5 flex items-center justify-between">
+                    <div class="space-y-1">
+                        <div class="flex items-center space-x-2">
+                            <span class="font-semibold text-slate-900 dark:text-white text-xs">${a.subject}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded font-medium ${a.statusClass}">${a.statusLabel}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-600 dark:text-slate-400 font-mono">${a.excerpt}</p>
+                    </div>
+                    <div class="text-right text-[10px] text-slate-500"><span>${a.date}</span></div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function renderLogsTable() {
+            const tbody = document.getElementById('fullAuditTableBody');
+            if(!tbody) return;
+            const founderAudits = audits.filter(a => a.startupName === 'Spotted');
+            if(founderAudits.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500 italic">No interviews logged yet.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = founderAudits.map(a => `
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-950/50 transition">
+                    <td class="p-3"><p class="font-semibold text-slate-900 dark:text-white">${a.subject}</p><p class="text-[10px] text-slate-500">${a.date}</p></td>
+                    <td class="p-3"><span class="text-[10px] px-2 py-0.5 rounded font-medium ${a.statusClass}">${a.statusLabel}</span></td>
+                    <td class="p-3 font-mono">${a.politeScore}</td>
+                    <td class="p-3 font-mono">${a.momScore}</td>
+                    <td class="p-3 text-right space-x-2">
+                        <button onclick="openFullAnalyze(${a.id})" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded font-semibold transition shadow-xs">Full Analyze</button>
+                        <button onclick="deleteAudit(${a.id})" class="text-slate-400 hover:text-rose-600 p-1.5 rounded transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function openDirectorStartupDetail(startupName) {
+            activeStartupDetail = startupName;
+            activeTab = 'startup-detail';
+            renderSidebarNav();
+            renderHeaderActions();
+            renderMainContent();
+        }
+
+        function openNewAuditModal() {
+            document.getElementById('auditModal').classList.remove('hidden');
+        }
+
+        function closeNewAuditModal() {
+            document.getElementById('auditModal').classList.add('hidden');
+        }
+
+        function openFullAnalyze(id) {
+            const audit = audits.find(a => a.id === id);
+            if(!audit) return;
+            document.getElementById('reportSubjectTitle').innerText = `Participant: ${audit.subject} (${audit.date})`;
+            const badge = document.getElementById('reportVerdictBadge');
+            badge.innerText = audit.statusLabel;
+            badge.className = `text-xs font-bold px-2.5 py-1 rounded inline-block mt-1 ${audit.status === 'FAIL' ? 'bg-rose-500/20 text-rose-600' : 'bg-amber-500/20 text-amber-600'}`;
+            document.getElementById('reportPoliteScore').innerText = audit.politeScore;
+            document.getElementById('reportMomScore').innerText = audit.momScore;
+            document.getElementById('reportTranscriptBox').innerHTML = `<p class="text-indigo-600 font-bold mb-1">// LOG EXCERPT (${audit.startupName})</p><p>${audit.excerpt}</p>`;
+            
+            // Show copilot banner only in founder mode
+            document.getElementById('copilotBanner').style.display = (activeRole === 'founder') ? 'flex' : 'none';
+            document.getElementById('copilotBox').classList.add('hidden');
+            document.getElementById('fullAnalyzeModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeFullAnalyzeModal() {
+            document.getElementById('fullAnalyzeModal').classList.add('hidden');
+        }
+
+        function openLPCertificateModal() {
+            document.getElementById('lpCertificateModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeLPCertificateModal() {
+            document.getElementById('lpCertificateModal').classList.add('hidden');
+        }
+
+        function toggleCopilotBox() {
+            const box = document.getElementById('copilotBox');
+            box.classList.toggle('hidden');
+            lucide.createIcons();
+        }
+
+        function submitNewAudit() {
+            const subj = document.getElementById('inputSubject').value.trim();
+            const text = document.getElementById('inputTranscript').value.trim();
+            if(!subj || !text) {
+                alert("Please fill in both the interview subject and the transcript.");
+                return;
+            }
+            const newAudit = {
+                id: Date.now(),
+                startupName: "Spotted",
+                subject: subj,
+                date: "Today, 2026",
+                status: "FAIL",
+                statusLabel: "FAIL: Polite Compliment Trap",
+                statusClass: "bg-rose-500/10 text-rose-600 border border-rose-500/30",
+                politeScore: "10 / 100",
+                momScore: "30 / 100",
+                excerpt: text
+            };
+            audits.unshift(newAudit);
+            closeNewAuditModal();
+            alert("Audit completed! This interview has automatically synced to the Incubator Director Command Center in real-time.");
+            renderMainContent();
+        }
+
+        function pauseTranche(startup) {
+            alert(`[GUARDRAIL ENFORCEMENT]: Funding tranche for ${startup} has been Paused due to unvalidated polite-trap failures.`);
+        }
+
+        function shareCommittee(startup) {
+            alert(`[COMMITTEE SYNC]: Verified audit reports for ${startup} shared with Investment Committee.`);
+        }
+
+        let currentMode = 'text';
+        function setInputMode(mode) {
+            currentMode = mode;
+            ['text', 'file', 'audio'].forEach(m => {
+                const btn = document.getElementById(`mode-${m}`);
+                const box = document.getElementById(`container-${m}`);
+                if(m === mode) {
+                    btn.className = "py-1.5 rounded bg-indigo-600 text-white font-semibold transition flex items-center justify-center space-x-1.5 shadow-xs";
+                    box.classList.remove('hidden');
+                } else {
+                    btn.className = "py-1.5 rounded text-slate-600 dark:text-slate-400 hover:text-white font-semibold transition flex items-center justify-center space-x-1.5";
+                    box.classList.add('hidden');
+                }
+            });
+            lucide.createIcons();
+        }
+
+        function deleteAudit(id) {
+            if(confirm("Delete this interview audit?")) {
+                audits = audits.filter(a => a.id !== id);
+                renderMainContent();
+            }
+        }
+
+        // Initialize App on Founder Mode
+        switchRole('founder');
+    </script>
+</body>
+</html>
